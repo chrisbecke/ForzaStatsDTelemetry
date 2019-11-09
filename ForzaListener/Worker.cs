@@ -259,6 +259,13 @@ namespace ForzaListner
             metrics.Gauge($"wheels.rear_right.{name}", wheel.RearRight*scale);
         }
 
+        public static void Gauge(this IMetrics metrics, string name, f32_vec vec, float scale = 1)
+        {
+            metrics.Gauge($"{name}.x", vec.X * scale);
+            metrics.Gauge($"{name}.y", vec.Y * scale);
+            metrics.Gauge($"{name}.z", vec.Z * scale);
+        }
+
         public static void Gauge(this IMetrics metrics, string name, SByte value)
         {
             metrics.Gauge(name, (uint)(value) & 0xff);
@@ -317,6 +324,8 @@ namespace ForzaListner
                 metrics.Gauge("dash.rpm", packet.currentEngineRpm);
                 metrics.Gauge("dash.rpm_idle", packet.engineIdleRpm);
                 metrics.Gauge("dash.rpm_max", packet.engineMaxRpm);
+
+                // Wheel and Suspension.
                 metrics.Gauge("temp",packet.tireTemp);
                 metrics.Gauge("rotation_speed", packet.wheelRotationSpeed);
                 metrics.Gauge("slip_ratio", packet.tireSlipRatio);
@@ -324,19 +333,13 @@ namespace ForzaListner
                 metrics.Gauge("slip_combined", packet.tireCombinedSlip);
                 metrics.Gauge("on_rumblestrip", packet.wheelOnRumbleStrip);
                 metrics.Gauge("in_puddle", packet.wheelInPuddleDepth);
+                metrics.Gauge("suspension_travel_cm", packet.suspensionTravelMeters, 100);
 
-                metrics.Gauge("physics.velocity.x", packet.velocity.X);
-                metrics.Gauge("physics.velocity.y", packet.velocity.Y);
-                metrics.Gauge("physics.velocity.z", packet.velocity.Z);
-                metrics.Gauge("physics.pitchyawroll.x", packet.pitch);
-                metrics.Gauge("physics.pitchyawroll.y", packet.yaw);
-                metrics.Gauge("physics.pitchyawroll.z", packet.roll);
-                metrics.Gauge("physics.angular_velocity.x", packet.angularVelocity.X);
-                metrics.Gauge("physics.angular_velocity.y", packet.angularVelocity.Y);
-                metrics.Gauge("physics.angular_velocity.z", packet.angularVelocity.Z);
-                metrics.Gauge("physics.acceleration.x", packet.acceleration.X);
-                metrics.Gauge("physics.acceleration.y", packet.acceleration.Y);
-                metrics.Gauge("physics.acceleration.z", packet.acceleration.Z);
+                metrics.Gauge("physics.velocity", packet.velocity);
+                metrics.Gauge("physics.pitchyawroll", packet.pitch);
+                metrics.Gauge("physics.angular_velocity", packet.angularVelocity);
+                metrics.Gauge("physics.acceleration", packet.acceleration);
+                metrics.Gauge("world.position", packet.position);
 
                 metrics.Gauge("dash.speed", packet.speed);
                 metrics.Gauge("dash.power", packet.power);
@@ -351,8 +354,6 @@ namespace ForzaListner
                 metrics.Gauge("race.boost", packet.boost);
                 metrics.Gauge("race.fuel", packet.fuel);
                 metrics.Gauge("race.distanceTravelled", packet.distanceTraveled);
-
-                metrics.Gauge("suspension_travel_cm", packet.suspensionTravelMeters, 100);
 
                 metrics.Gauge("car.driveTrainType", packet.driveTrainType);
                 metrics.Gauge("car.ordinal", packet.carOrdinal);
@@ -381,8 +382,9 @@ namespace ForzaListner
                 metrics.Gauge("unknown.b241", packet.ba);
                 metrics.Gauge("unknown.b242", packet.bb);
                 metrics.Gauge("unknown.b243", packet.bc);
+                metrics.Gauge("unknown.b343", packet.last);
 
-                if(random.NextDouble() <= 0.001)
+                if (random.NextDouble() <= 0.001)
                   _logger.LogInformation($"{packet.timeStampMS}: receive {data.Length} bytes from {address}");
             }
         }
