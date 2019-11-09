@@ -17,7 +17,7 @@ namespace ForzaListner
 
     public class ForzaConfig
     {
-        public int port = 5200;
+        public int port { get; set; } = 5200;
     }
 
     public class ForzaPacket
@@ -273,6 +273,10 @@ namespace ForzaListner
         {
             metrics.Gauge(name, (uint)Math.Abs(value));
         }
+    }
+
+    class ForzaState
+    {
 
 
     }
@@ -294,19 +298,25 @@ namespace ForzaListner
         {
             UdpClient server = new UdpClient(config.port);
 
+            _logger.LogInformation($"Listening on port: {config.port}");
+            var result = await server.ReceiveAsync();
+            var address = result.RemoteEndPoint;
+            var data = result.Buffer;
+            _logger.LogInformation($"Receive {data.Length} bytes from {address}");
+
             Random random = new Random();
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var address = new IPEndPoint(0,0);
-                var data = server.Receive(ref address);
+                address = new IPEndPoint(0,0);
+                data = server.Receive(ref address);
 
                 var packet = new ForzaPacket(data);
 
                 metrics.Gauge("timeStampMS", packet.timeStampMS);
-                metrics.Gauge("engine.CurrentRpm", packet.currentEngineRpm);
-                metrics.Gauge("engine.IdleRpm", packet.engineIdleRpm);
-                metrics.Gauge("engine.MaxRpm", packet.engineMaxRpm);
+                metrics.Gauge("dash.rpm", packet.currentEngineRpm);
+                metrics.Gauge("dash.rpm_idle", packet.engineIdleRpm);
+                metrics.Gauge("dash.rpm_max", packet.engineMaxRpm);
                 metrics.Gauge("temp",packet.tireTemp);
                 metrics.Gauge("rotation_speed", packet.wheelRotationSpeed);
                 metrics.Gauge("slip_ratio", packet.tireSlipRatio);
@@ -318,9 +328,9 @@ namespace ForzaListner
                 metrics.Gauge("physics.velocity.x", packet.velocity.X);
                 metrics.Gauge("physics.velocity.y", packet.velocity.Y);
                 metrics.Gauge("physics.velocity.z", packet.velocity.Z);
-                metrics.Gauge("physics.pitch", packet.pitch);
-                metrics.Gauge("physics.yaw", packet.yaw);
-                metrics.Gauge("physics.roll", packet.roll);
+                metrics.Gauge("physics.pitchyawroll.x", packet.pitch);
+                metrics.Gauge("physics.pitchyawroll.y", packet.yaw);
+                metrics.Gauge("physics.pitchyawroll.z", packet.roll);
                 metrics.Gauge("physics.angular_velocity.x", packet.angularVelocity.X);
                 metrics.Gauge("physics.angular_velocity.y", packet.angularVelocity.Y);
                 metrics.Gauge("physics.angular_velocity.z", packet.angularVelocity.Z);
@@ -359,7 +369,18 @@ namespace ForzaListner
                 metrics.Gauge("assist.aiBrakeDifference", packet.normalizedAIBrakeDifference);
                 metrics.Gauge("assist.drivingLine", packet.normalizedDrivingLine);
 
-                metrics.Gauge("unknown.b343", packet.last);
+                metrics.Gauge("unknown.b232", packet.b1);
+                metrics.Gauge("unknown.b233", packet.b2);
+                metrics.Gauge("unknown.b234", packet.b3);
+                metrics.Gauge("unknown.b235", packet.b4);
+                metrics.Gauge("unknown.b236", packet.b5);
+                metrics.Gauge("unknown.b237", packet.b6);
+                metrics.Gauge("unknown.b238", packet.b7);
+                metrics.Gauge("unknown.b239", packet.b8);
+                metrics.Gauge("unknown.b240", packet.b9);
+                metrics.Gauge("unknown.b241", packet.ba);
+                metrics.Gauge("unknown.b242", packet.bb);
+                metrics.Gauge("unknown.b243", packet.bc);
 
                 if(random.NextDouble() <= 0.001)
                   _logger.LogInformation($"{packet.timeStampMS}: receive {data.Length} bytes from {address}");
