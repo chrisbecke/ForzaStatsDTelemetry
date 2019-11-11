@@ -3,16 +3,16 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build
 WORKDIR /src
-COPY ["ForzaListner/ForzaListner.csproj", "ForzaListner/"]
-RUN dotnet restore "ForzaListner/ForzaListner.csproj"
+COPY ForzaListener/ForzaListener.csproj ForzaListener/
+RUN dotnet restore "ForzaListener/ForzaListener.csproj"
 COPY . .
-WORKDIR "/src/ForzaListner"
-RUN dotnet build "ForzaListner.csproj" -c Release -o /app/build
+WORKDIR "/src/ForzaListener"
+RUN dotnet build "ForzaListener.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "ForzaListner.csproj" -c Release -o /app/publish
+RUN dotnet publish "ForzaListener.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "ForzaListner.dll"]
+ENTRYPOINT ["dotnet", "ForzaListener.dll"]
