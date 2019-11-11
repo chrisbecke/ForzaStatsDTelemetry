@@ -16,7 +16,7 @@ services:
     ports:
       - 3000:3000
     environment:
-      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource"
+#      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource"
       GF_SECURITY_ADMIN_PASSWORD: "secret"
     volumes:
       - data:/var/lib/grafana
@@ -25,10 +25,10 @@ services:
     image: graphiteapp/graphite-statsd
     ports:
       - "3001:80"
-      - 2003-2004:2003-2004
-      - 2023-2024:2023-2024
-      - 8125:8125/udp
-      - 8126:8126
+#      - 2003-2004:2003-2004
+#      - 2023-2024:2023-2024
+#      - 8125:8125/udp
+#      - 8126:8126
     environment:
 #      MEMCACHE_HOST: "memcached:11211"
       CACHE_DURATION: 60
