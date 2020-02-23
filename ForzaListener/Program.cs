@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ForzaListener;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,6 +25,7 @@ namespace ForzaListner
                     var statsConfig = new StatsDConfig();
                     hostContext.Configuration.GetSection("StatsD").Bind(statsConfig);
                     services.AddSingleton<IMetrics>(new StatsDService(statsConfig));
+//                    services.AddSingleton<IMetrics>(new ContainerMetricService());
                     services.AddHostedService<Worker>();
                 });
     }

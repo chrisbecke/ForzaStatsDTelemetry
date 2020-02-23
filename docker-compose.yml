@@ -7,7 +7,7 @@ services:
       context: .
       dockerfile: ForzaListener/Dockerfile
     ports:
-      - 1024:1024/udp
+      - 5200:5200/udp
     depends_on:
       - graphite
 

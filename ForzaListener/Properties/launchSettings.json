@@ -1,13 +1,15 @@
 {
   "profiles": {
-    "ForzaListener": {
-      "commandName": "Project",
-      "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Development"
-      }
-    },
     "Docker": {
       "commandName": "Docker"
+    },
+    "ForzaListener": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:5000/"
     }
   }
 }

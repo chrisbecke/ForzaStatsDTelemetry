@@ -1,45 +1,25 @@
-﻿using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
+﻿using System;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace ForzaListner
+namespace ForzaListener
 {
-    public class StatsDConfig
+    public class ContainerMetricService : IMetrics
     {
-        public int port { get; set; } = 8125;
-        public string address { get; set; } = "127.0.0.1";
-        public int mtu { get; set; } = 512;
-        public string prefix { get; set; } = "acme.";
-    }
 
-    class StatsDService : IMetrics
-    {
-        StatsDConfig config;
-        UdpClient server;
+        static readonly string prefix = "forza";
+        static readonly int mtu = 512;
+
+        public ContainerMetricService()
+        {
+        }
+
         Random random = new Random();
         StringBuilder buf = new StringBuilder();
 
-        public StatsDService(StatsDConfig options)
-        {
-            config = options;
-
-            server = new UdpClient();
-            var addressList = Dns.GetHostAddresses(config.address);
-
-            var endPoint = new IPEndPoint(addressList[0], config.port);
-
-            server.Connect(endPoint);
-        }
-
         public void Flush()
         {
-            byte[] send_buffer = Encoding.ASCII.GetBytes(buf.ToString());
+            Console.Write(buf);
             buf.Clear();
-            server.Send(send_buffer, send_buffer.Length);
         }
 
         public void Increment(string name, int count, float rate)
@@ -99,9 +79,9 @@ namespace ForzaListner
 
         public void Send(string stat, double rate, string format)
         {
-            if(!string.IsNullOrWhiteSpace(config.prefix))
+            if (!string.IsNullOrWhiteSpace(prefix))
             {
-                stat = config.prefix + stat;
+                stat = prefix + stat;
             }
 
             if (rate < 1)
@@ -113,7 +93,7 @@ namespace ForzaListner
                 else return;
             }
 
-            if(buf.Length + format.Length > config.mtu)
+            if (buf.Length + format.Length > mtu)
             {
                 Flush();
             }
@@ -121,7 +101,7 @@ namespace ForzaListner
             if (buf.Length > 0)
                 buf.Append("\n");
 
-            buf.Append($"{stat}:{format}");
+            buf.Append($"{{ '{stat}': {format} }}");
         }
     }
 }
