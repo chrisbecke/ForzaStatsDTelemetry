@@ -1,5 +1,6 @@
 # ForzaStatsDTelemetry
 A StatsD adapter for Forza  Horizon 4 telemetry.
+This may or may not work with other versions of Forza Horizon or Motorsport but the telemetry data layout changes and I've only tested with Horizon 4.
 
 ## Getting Started
 
@@ -8,6 +9,8 @@ Visual Studio, to build this app.
 Forza Horizon 4 for the XBOX or PC.  
 
 ## Enable localhost loopback for Forza on Windows 10
+
+Windows Store applications are blocked from connecting to localhost. If the statsd listner and Horizon are both on the same Desktop, then an excemption can be created. 
 
 ```
 CheckNetIsolation.exe LoopbackExempt -a -n=microsoft.apollobasegame_8wekyb3d8bbwe
@@ -69,3 +72,7 @@ services:
       - statsd_etc:/opt/statsd/config
       - redis:/var/lib/redis    
 ```
+
+## Hooking it up
+
+The Settings menu in Forza Horizon has a menu option called "Data Out" Set the host to be "localhost" - or wherever you are running the collector and the port to be "5200".
